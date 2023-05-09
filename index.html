@@ -53,6 +53,9 @@
             <p class="animated slideInRight">the button below.</p>
             <a  id="fun1" class="btn homebtn smoothScroll" onclick="myFunction1()">SPORTS1 Switch to Ad Mode </a>
             <a  id="fun2" class="btn homebtn smoothScroll" onclick="myFunction2()">SPORTS2 Switch to Ad Mode </a>
+            <a  id="reg1" class="btn homebtn smoothScroll" onclick="registerDevice()">Register</a>
+            <a  id="busi1" class ="btn homebtn smoothScroll" onclick="trimBusinessLogs()">Trim Logs</a>
+
         </header>     
       </div><!-- /headerwrap -->
   
@@ -91,12 +94,14 @@ function myFunction1() {
   {
   console.log("HI");
   document.getElementById("fun1").innerHTML = "SPORTS1 Switch to TV Mode";
+  registerDevice();
   db.ref().child("pi_cha-status").update({"sports1":true});
   
 
   }
   else
   {
+  console.log("HI");
   document.getElementById("fun1").innerHTML = "SPORTS1 Switch to Ad Mode";
   db.ref().child("pi_cha-status").update({"sports1":false});
   
@@ -108,14 +113,106 @@ function myFunction2() {
   {
   console.log("HI");
   document.getElementById("fun2").innerHTML = "SPORTS2 Switch to TV Mode";
+  registerDevice()
   db.ref().child("pi_cha-status").update({"sports2":true});
   
   }
   else
   {
+  console.log("HI");
   document.getElementById("fun2").innerHTML = "SPORTS2 Switch to Ad Mode";
   db.ref().child("pi_cha-status").update({"sports2":false});
   
+  }
+}
+
+function registerDevice() {
+  if (document.getElementById("reg1").innerHTML =="Register")
+  {
+    console.log("in Register Device");
+    db.ref('devices').orderByKey().on('value',snaps=>{
+      snaps.forEach(child=> {
+        var id = child.key;
+        console.log(id);
+        db.ref("pi_name-cha/" + id).on('value',snap=>{
+            if (snap.exists())
+            {
+              console.log ("NODE: " + snap.key + " EXISTS, NOT UPDATING")
+            }
+            else{
+              console.log("NODE: " + snap.key + " DOES NOT EXIST, UPDATING")
+        db.ref().child("pi_name-cha/" + id).update({
+        URL: "10 Creative Commercial Ad 2022।.mp4",
+        adid: {
+          0: "ad000",
+          1: "ad001",
+          2: "ad002",
+          3: "ad003",
+          4: "ad004",
+          5: "ad005",
+          6: "ad006",
+          7: "ad007",
+          8: "ad008",
+          9: "ad009",
+        },
+        channel: "sports2",
+        start_time: {
+          0: "0",
+          1: "40",
+          2: "85",
+          3: "120",
+          4: "151",
+          5: "180",
+          6: "210",
+          7: "238",
+          8: "267",
+          9: "326",
+        }
+      }
+    );
+      }
+    });
+    document.getElementById("reg1").innerHTML = "Registered";
+    
+  })}
+  );
+  }
+  else
+  {
+    //
+  }
+}
+
+function trimBusinessLogs() {
+  if (document.getElementById("busi1").innerHTML =="Trim Logs")
+  {
+    db.ref('devices').orderByKey().on('value',snaps=>{
+      snaps.forEach(child=> {
+        var id = child.key;
+        // console.log(id);
+  db.ref("business_log/" + id).on('value',snap=>{
+      console.log ("Number of record: " + snap.numChildren());
+      if (snap.numChildren() > 300)
+      {
+        console.log("TRIMMING");
+        db.ref("business_log/" + id).orderByKey().limitToFirst(1).once('value').then(function(snapshot) {
+          snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
+            console.log(key);
+            db.ref("business_log/" + id + "/" + key).remove();
+          });
+        });
+      }
+      else
+      {
+        console.log("NOT TRIMMING");
+      }
+  })
+})
+    })}
+  else
+  {
+    //
   }
 }
 
